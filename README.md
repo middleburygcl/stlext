@@ -9,6 +9,8 @@ To use the extensions, simply include `stlext.h` in your project. The `CMake` co
 - A compiler which supports the `C++11` standard.
 - (optional) `CMake` to build the tests.
 
+To run the tests, please configure the project with a `C++` compiler of your choice by specifying `-DCMAKE_CXX_COMPILER=[compiler]`. The default is `g++-13` because that's what I have on my system. All the tests can be run with `make testall`.
+
 ### **why?**
 
 I personally don't find compiler support for `C++17` parallel algorithms (`__cpp_lib_parallel_algorithm`) to be very robust yet. GNU supports `__cpp_lib_parallel_algorithm` (using Intel's `TBB` as well as an `OpenMP`-supported compiler). `Clang` also supports it if you use the `g++` `stdlib` (via `-stdlib=libstdc++`), but I haven't been able to get this to work with `Clang` on Mac (maybe this works now with a newer version of XCode).
@@ -70,3 +72,19 @@ Alternatively, the last line could be:
 ```c++
 std::parafor_i(0, n, fn);
 ```
+
+### **license**
+
+Copyright 2023 Philip Claude Caplan
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
