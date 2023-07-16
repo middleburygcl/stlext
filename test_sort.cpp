@@ -12,9 +12,9 @@ int main(int argc, char** argv) {
   if (argc > 1) n = std::atoi(argv[1]);
   std::vector<float> values(n);
 
-  int method = 1, n_iter = 1;
+  int method = 1, n_test = 1;
   if (argc > 2) method = std::atoi(argv[2]);
-  if (argc > 3) n_iter = std::atoi(argv[3]);
+  if (argc > 3) n_test = std::atoi(argv[3]);
 
   std::cout << "testing n = " << n / 1e6 << "M with "
             << std::thread::hardware_concurrency() << " threads with ";
@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   std::cout << std::endl;
 
   double total_time = 0.0;
-  for (int iter = 0; iter < n_iter; iter++) {
+  for (int iter = 0; iter < n_test; iter++) {
     for (size_t i = 0; i < n; i++)
       values[i] = double(rand()) / double(RAND_MAX);
 
@@ -52,7 +52,6 @@ int main(int argc, char** argv) {
       assert(values[i - 1] <= values[i]);
     }
   }
-  std::cout << "average time for " << n_iter
-            << " iterations: " << total_time / n_iter << std::endl;
+  std::cout << "average time (s):\n\t" << total_time / n_test << std::endl;
   return 0;
 }
