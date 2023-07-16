@@ -68,7 +68,7 @@ struct hash<std::array<T, 3>> {
   }
 };
 
-#ifdef __cpp_lib_parallel_algorithm
+#if defined(__cpp_lib_parallel_algorithm) && !defined(FORCE_STLEXT)
 
 template <class RandomAccessIterator,
           class Compare = std::less<
@@ -76,11 +76,6 @@ template <class RandomAccessIterator,
 void parasort(RandomAccessIterator first, RandomAccessIterator last,
               Compare cmp = Compare{}) {
   std::sort(std::execution::par, first, last, cmp);
-}
-
-template <class InputIt, class UnaryFunction>
-UnaryFunction parafor(InputIt first, InputIt last, UnaryFunction f) {
-  return std::for_each(std::execution::par, first, last, f);
 }
 
 #else
@@ -118,7 +113,7 @@ void parasort(RandomAccessIterator first, RandomAccessIterator last,
     sort_futures[i] = std::async(std::launch::async, sort_threads[i]);
   }
 
-  // sort the subarrays in parallel
+  // wait for the subarrays to be sorted
   for (size_t i = 0; i < n_thread; i++) sort_futures[i].get();
 
   // merge the subarrays
@@ -161,13 +156,15 @@ void parasort(RandomAccessIterator first, RandomAccessIterator last,
   }
 }
 
+#endif
+
 template <class RandomAccessIterator, class Function>
 void parafor(RandomAccessIterator first, RandomAccessIterator last,
              Function fn) {
   size_t n = std::distance(first, last);
   size_t n_thread = std::thread::hardware_concurrency();
   if (n < 5 * n_thread) {
-    for (; first != last; ++first) fn(*first);
+    for (; first != last; ++first) fn(0, *first);
     return;
   }
 
@@ -177,32 +174,32 @@ void parafor(RandomAccessIterator first, RandomAccessIterator last,
   std::vector<std::future<void>> exec_futures(n_thread);
   for (size_t i = 0; i < n_thread; i++) {
     auto start = first + i * m;
-    auto end = first + start + m;
+    auto end = start + m;
     if (i + 1 == n_thread) end = last;
-    exec_threads[i] = [start, end, &fn]() {
-      for (; start != end; ++start) fn(*start);
+    exec_threads[i] = [start, end, &fn, m, i]() {
+      auto it = start;
+      size_t j = i * m;
+      for (; it != end; ++it) fn(i, j++);
     };
     exec_futures[i] = std::async(std::launch::async, exec_threads[i]);
   }
 
-  // run the function in parallel
+  // wait for all threads to finish
   for (size_t i = 0; i < n_thread; i++) exec_futures[i].get();
 }
 
-#endif
-
 template <class Function>
-void paraloop(int64_t first, int64_t last, Function f) {
+void parafor_i(size_t first, size_t last, Function fn) {
 #if HAVE_OMP
 #pragma omp parallel for
-  for (int64_t i = first; i < last; ++i) f(omp_get_thread_num(), i);
+  for (size_t i = first; i < last; ++i) fn(omp_get_thread_num(), i);
   return;
 #endif
 
   size_t n = last - first;
   size_t n_thread = std::thread::hardware_concurrency();
   if (n < 5 * n_thread) {
-    for (auto i = first; i < last; ++i) f(0, i);
+    for (auto i = first; i < last; ++i) fn(0, i);
     return;
   }
 
@@ -214,13 +211,13 @@ void paraloop(int64_t first, int64_t last, Function f) {
     auto start = first + i * m;
     auto end = first + start + m;
     if (i + 1 == n_thread) end = last;
-    exec_threads[i] = [i, start, end, &f]() {
-      for (auto j = start; j < end; ++j) f(i, j);
+    exec_threads[i] = [i, start, end, &fn]() {
+      for (auto j = start; j < end; ++j) fn(i, j);
     };
     exec_futures[i] = std::async(std::launch::async, exec_threads[i]);
   }
 
-  // run the function in parallel
+  // wait for all threads to finish
   for (size_t i = 0; i < n_thread; i++) exec_futures[i].get();
 }
 

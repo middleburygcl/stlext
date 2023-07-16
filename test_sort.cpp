@@ -2,6 +2,7 @@
 #include <execution>
 #include <iostream>
 
+#define FORCE_STLEXT
 #include "stlext.h"
 #include "test.h"
 
@@ -15,7 +16,8 @@ int main(int argc, char** argv) {
   if (argc > 2) method = std::atoi(argv[2]);
   if (argc > 3) n_iter = std::atoi(argv[3]);
 
-  std::cout << "testing sort for " << n / 1e6 << "M values with ";
+  std::cout << "testing n = " << n / 1e6 << "M with "
+            << std::thread::hardware_concurrency() << " threads with ";
   if (method == 0) std::cout << "serial sort";
   if (method == 1) std::cout << "parasort";
   if (method == 2) std::cout << "c++17 parallel sort";
