@@ -177,10 +177,10 @@ void parasort(RandomAccessIterator first, RandomAccessIterator last,
 
 template <class RandomAccessIterator, class Function>
 void parafor(RandomAccessIterator first, RandomAccessIterator last,
-             Function fn) {
+             Function fn, bool serial_override = false) {
   size_t n = std::distance(first, last);
   size_t n_thread = std::thread::hardware_concurrency();
-  if (n < 5 * n_thread) {
+  if (n < 5 * n_thread || serial_override) {
     for (; first != last; ++first) fn(0, *first);
     return;
   }
@@ -206,7 +206,7 @@ void parafor(RandomAccessIterator first, RandomAccessIterator last,
 }
 
 template <class Function>
-void parafor_i(size_t first, size_t last, Function fn) {
+void parafor_i(size_t first, size_t last, Function fn, bool serial_override = false) {
 #if HAVE_OMP
 #pragma omp parallel for
   for (size_t i = first; i < last; ++i) fn(omp_get_thread_num(), i);
@@ -215,7 +215,7 @@ void parafor_i(size_t first, size_t last, Function fn) {
 
   size_t n = last - first;
   size_t n_thread = std::thread::hardware_concurrency();
-  if (n < 5 * n_thread) {
+  if (n < 5 * n_thread || serial_override) {
     for (auto i = first; i < last; ++i) fn(0, i);
     return;
   }
