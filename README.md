@@ -13,7 +13,7 @@ To run the tests, please configure the project with a `C++` compiler of your cho
 
 ### **why?**
 
-I personally don't find compiler support for `C++17` parallel algorithms (`__cpp_lib_parallel_algorithm`) to be very robust yet. GNU supports `__cpp_lib_parallel_algorithm` (using Intel's `TBB` as well as an `OpenMP`-supported compiler). `Clang` also supports it if you use the `g++` `stdlib` (via `-stdlib=libstdc++`), but I haven't been able to get this to work with `Clang` on Mac (maybe this works now with a newer version of XCode).
+I personally don't find compiler support for `C++17` parallel algorithms (`__cpp_lib_parallel_algorithm`) to be very good yet. GNU supports `__cpp_lib_parallel_algorithm` (using Intel's `TBB` as well as an `OpenMP`-supported compiler). `Clang` also supports it if you use the `g++` `stdlib` (via `-stdlib=libstdc++`), but I haven't been able to get this to work with `Clang` on Mac (maybe this works now with a newer version of XCode).
 
 Also, I generally like to know the thread index when running a `for`-loop in parallel (similar to `omp_get_thread_num()` with `OpenMP`), usually if the `for`-loop requires a workspace buffer when performing the parallel computation. The functions `std::parafor` and `std::parafor_i` allow parallel execution of a `for`-loop with information about which element is being processed (by index) as well as which thread is invoking the callback.
 
@@ -55,7 +55,7 @@ or with a custom comparator:
 std::parasort(values.begin(), values.end(), [](float a, float b) { return a > b; });
 ```
 
-### **`std::parafor` and `std::parafor_i`**
+#### **`std::parafor` and `std::parafor_i`**
 
 ```c++
 size_t n = 1e9;
@@ -73,7 +73,7 @@ Alternatively, the last line could be:
 std::parafor_i(0, n, fn);
 ```
 
-### **license**
+### **LICENSE**
 
 Copyright 2023 Philip Claude Caplan
 

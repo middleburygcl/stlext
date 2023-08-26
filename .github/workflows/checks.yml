@@ -1,0 +1,39 @@
+name: checks
+
+on:
+  pull_request:
+    branches: main
+
+env:
+  BUILD_TYPE: RelWithDebInfo
+
+jobs:
+  cc-build-format-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: configure
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ./
+
+    - name: build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: format
+      uses: cpp-linter/cpp-linter-action@v2
+      id: linter
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        style: Google
+
+    - name: check failure
+      if: steps.linter.outputs.checks-failed > 0
+      run: |
+        echo "Some files failed the linting checks!"
+        exit 1
+
+    - name: test
+      working-directory: ${{github.workspace}}/build
+      run: make testall
