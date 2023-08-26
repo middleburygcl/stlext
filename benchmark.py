@@ -22,6 +22,6 @@ print(t_stdsort)
 table = '| n | std::sort (serial) | std::sort (parallel) | std::parasort |\n'
 table += '| --- | --- | --- | --- |\n'
 for p in p_list:
-	table += f"| $10^{p}$ | {t_serial[p]:.3f} | {t_stdsort[p]:.3f} ({t_serial[p] / t_stdsort[p]:.2f})| {t_parasort[p]:.3f} ({t_serial[p] / t_parasort[p]:.2f}) |\n"
+	table += f"| $10^{p}$ | {t_serial[p]:.1f} | {t_stdsort[p]:.1f} ({t_serial[p] / t_stdsort[p]:.3f})| {t_parasort[p]:.1f} ({t_serial[p] / t_parasort[p]:.2f}) |\n"
 with open('sort_timing.md', 'w') as f:
 	f.write(table)

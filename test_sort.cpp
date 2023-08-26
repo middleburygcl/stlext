@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
     timer.start();
     if (method == 0) {
 #if defined(__GNUC__) and not defined(__clang__)
-      std::sort(values.begin(), values.end(), __gnu_parallel::sequential_tag());
+      std::sort(values.begin(), values.end(), [](float a, float b){ return a > b; },  __gnu_parallel::sequential_tag());
 #else
       std::sort(values.begin(), values.end(),
                 [](float a, float b) { return a > b; });
@@ -55,6 +55,6 @@ int main(int argc, char** argv) {
       assert(values[i - 1] >= values[i]);
     }
   }
-  std::cout << "average time (s):\n\t" << total_time / n_test << std::endl;
+  std::cout << "average time (ms):\n\t" << 1000 * total_time / n_test << std::endl;
   return 0;
 }

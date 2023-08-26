@@ -26,14 +26,14 @@ Also, I generally like to know the thread index when running a `for`-loop in par
 
 #### **`std::parasort` benchmark**
 
-Here is a comparison of `std::parasort` with the `C++17` Parallel STL (using `g++-13`) on an Apple M1 Pro (2021) using 10 threads. The number of values (each a `float`) being sorted is `n`, and the sorting is performed 50 times and then averaged to produce the table below. All cell values are in seconds and the values in parentheses represent the speedup over sorting sequentially.
+Here is a comparison of `std::parasort` with the `C++17` Parallel STL (using `g++-13`) on an Apple M1 Pro (2021) using 10 threads. The number of values (each a `float`) being sorted is `n`, and the sorting is performed 50 times and then averaged to produce the table below. All cell values are in milliseconds and the values in parentheses represent the speedup over sorting sequentially.
 
 | n      | std::sort (serial) | std::sort (parallel) | std::parasort |
-| ------ | ------------------ | -------------------- | ------------- |
-| $10^5$ | 0.005              | 0.000 (35.86)        | 0.005 (1.00)  |
-| $10^6$ | 0.067              | 0.009 (7.35)         | 0.023 (2.92)  |
-| $10^7$ | 0.775              | 0.110 (7.03)         | 0.210 (3.69)  |
-| $10^8$ | 8.684              | 1.287 (6.75)         | 2.162 (4.02)  |
+| ------ | -------------------| -------------------- | ------------- |
+| $10^5$ | 5.0                | 0.8 (6.0)            | 5.0 (1.01)    |
+| $10^6$ | 65.8               | 9.5 (6.91)           | 22.4 (2.94)   |
+| $10^7$ | 764                | 121 (6.32)           | 207 (3.69)    |
+| $10^8$ | 8623               | 1314 (6.56)          | 2123 (4.06)   |
 
 As you can see, `std::parasort` is not as fast as the `C++17` Parallel STL, however, it's at least faster (in general) than sorting sequentially. It divides and sorts (in parallel) chunks of the input array and then merges the result (sequentially). I'm sure a different algorithm like parallel radix sort would be faster.
 
